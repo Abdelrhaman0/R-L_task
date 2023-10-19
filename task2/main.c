@@ -5,6 +5,10 @@ struct User
 {
     char username[50];
     char password[50];
+    union {
+        int flag;
+        _Bool isActive;
+    };
 };
 
 void registerUser(struct User users[], int *userCount)
@@ -14,6 +18,10 @@ void registerUser(struct User users[], int *userCount)
     scanf("%s", newUser.username);
     printf("Enter the password: ");
     scanf("%s", newUser.password);
+
+    // Ask the user to set the flag
+    printf("Enter flag (0 for False, 1 for True): ");
+    scanf("%d", &newUser.flag);
 
     users[*userCount] = newUser;
     (*userCount)++;
@@ -26,7 +34,7 @@ int loginUser(struct User users[], int userCount, char username[], char password
     {
         if (strcmp(users[i].username, username) == 0 && strcmp(users[i].password, password) == 0)
         {
-            return 1;
+            return users[i].isActive;
         }
     }
     return 0;
@@ -71,15 +79,20 @@ int main()
                 printf("Enter your password: ");
                 scanf("%s", password);
 
-                if (loginUser(users, userCount, username, password))
+                int loginResult = loginUser(users, userCount, username, password);
+                if (loginResult == 1)
                 {
                     loggedIn = 1;
                     strcpy(currentUser, username);
                     printf("Login successful!\n");
                 }
-                else
+                else if (loginResult == 0)
                 {
                     printf("Login failed. Invalid username or password.\n");
+                }
+                else
+                {
+                    printf("Login failed. Account is not active.\n");
                 }
             }
             break;
